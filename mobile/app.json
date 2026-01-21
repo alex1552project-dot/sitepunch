@@ -1,0 +1,66 @@
+{
+  "expo": {
+    "name": "SitePunch",
+    "slug": "sitepunch",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./src/assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./src/assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#2563eb"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.sitepunch.app",
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "SitePunch needs your location to record clock in/out positions for time tracking.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "SitePunch needs your location to record clock in/out positions for time tracking.",
+        "NSCameraUsageDescription": "SitePunch needs camera access to take photos for incident reports.",
+        "NSPhotoLibraryUsageDescription": "SitePunch needs photo library access to attach photos to incident reports."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./src/assets/adaptive-icon.png",
+        "backgroundColor": "#2563eb"
+      },
+      "package": "com.sitepunch.app",
+      "versionCode": 1,
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ]
+    },
+    "web": {
+      "favicon": "./src/assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "SitePunch needs your location to record clock in/out positions."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "SitePunch needs access to your photos for incident reports.",
+          "cameraPermission": "SitePunch needs camera access to capture incident photos."
+        }
+      ],
+      "expo-secure-store"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "your-eas-project-id"
+      }
+    }
+  }
+}
