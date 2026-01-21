@@ -1,0 +1,1658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SitePunch Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0f1419;
+      --bg-card: #1a1f2e;
+      --bg-card-hover: #242b3d;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --border: #2d3748;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-primary);
+      min-height: 100vh;
+    }
+
+    /* Login Screen */
+    .login-container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .login-box {
+      background: var(--bg-card);
+      border-radius: 16px;
+      padding: 48px;
+      width: 100%;
+      max-width: 420px;
+      border: 1px solid var(--border);
+    }
+
+    .login-logo {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    .login-subtitle {
+      color: var(--text-secondary);
+      margin-bottom: 32px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      color: var(--text-secondary);
+      font-size: 14px;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 14px 16px;
+      background: var(--bg-dark);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text-primary);
+      font-size: 16px;
+      font-family: inherit;
+      transition: border-color 0.2s;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 24px;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+      width: 100%;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background: var(--bg-card-hover);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--border);
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: white;
+    }
+
+    .btn-small {
+      padding: 8px 16px;
+      font-size: 14px;
+    }
+
+    .error-message {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid var(--danger);
+      color: var(--danger);
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+
+    /* Dashboard Layout */
+    .dashboard {
+      display: none;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 260px;
+      height: 100vh;
+      background: var(--bg-card);
+      border-right: 1px solid var(--border);
+      padding: 24px 0;
+      overflow-y: auto;
+    }
+
+    .sidebar-logo {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--accent);
+      padding: 0 24px;
+      margin-bottom: 32px;
+    }
+
+    .sidebar-nav {
+      list-style: none;
+    }
+
+    .nav-item {
+      padding: 14px 24px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.2s;
+      border-left: 3px solid transparent;
+    }
+
+    .nav-item:hover {
+      background: var(--bg-card-hover);
+      color: var(--text-primary);
+    }
+
+    .nav-item.active {
+      background: rgba(59, 130, 246, 0.1);
+      color: var(--accent);
+      border-left-color: var(--accent);
+    }
+
+    .nav-icon {
+      width: 20px;
+      text-align: center;
+    }
+
+    .sidebar-footer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 20px 24px;
+      border-top: 1px solid var(--border);
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+    }
+
+    .user-name {
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .user-role {
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+
+    .logout-btn {
+      width: 100%;
+      padding: 10px;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .logout-btn:hover {
+      background: var(--danger);
+      border-color: var(--danger);
+      color: white;
+    }
+
+    /* Main Content */
+    .main-content {
+      margin-left: 260px;
+      padding: 32px;
+      min-height: 100vh;
+    }
+
+    .page-header {
+      margin-bottom: 32px;
+    }
+
+    .page-title {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .page-subtitle {
+      color: var(--text-secondary);
+    }
+
+    /* Stats Cards */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border-radius: 12px;
+      padding: 24px;
+      border: 1px solid var(--border);
+    }
+
+    .stat-label {
+      color: var(--text-secondary);
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+    }
+
+    .stat-value.success { color: var(--success); }
+    .stat-value.warning { color: var(--warning); }
+    .stat-value.danger { color: var(--danger); }
+
+    /* Data Tables */
+    .card {
+      background: var(--bg-card);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+
+    .card-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .card-body {
+      padding: 24px;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .table th {
+      text-align: left;
+      padding: 14px 16px;
+      color: var(--text-secondary);
+      font-weight: 500;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .table td {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    .table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .table tr:hover td {
+      background: var(--bg-card-hover);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .badge-success {
+      background: rgba(34, 197, 94, 0.15);
+      color: var(--success);
+    }
+
+    .badge-warning {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--warning);
+    }
+
+    .badge-danger {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--danger);
+    }
+
+    .badge-info {
+      background: rgba(59, 130, 246, 0.15);
+      color: var(--accent);
+    }
+
+    /* Page Sections */
+    .page-section {
+      display: none;
+    }
+
+    .page-section.active {
+      display: block;
+    }
+
+    /* Activity Feed */
+    .activity-item {
+      display: flex;
+      gap: 16px;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .activity-item:last-child {
+      border-bottom: none;
+    }
+
+    .activity-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .activity-icon.clock-in {
+      background: rgba(34, 197, 94, 0.15);
+      color: var(--success);
+    }
+
+    .activity-icon.clock-out {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--danger);
+    }
+
+    .activity-icon.incident {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--warning);
+    }
+
+    .activity-text {
+      flex: 1;
+    }
+
+    .activity-title {
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .activity-time {
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    /* Forms */
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--bg-card);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      border: 1px solid var(--border);
+    }
+
+    .modal-header {
+      padding: 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-title {
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 24px;
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+    }
+
+    .modal-close:hover {
+      color: var(--text-primary);
+    }
+
+    .modal-body {
+      padding: 24px;
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 48px;
+      color: var(--text-secondary);
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    /* Loading Spinner */
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+        z-index: 100;
+      }
+
+      .main-content {
+        margin-left: 0;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      .table {
+        font-size: 14px;
+      }
+
+      .table th, .table td {
+        padding: 12px 8px;
+      }
+    }
+
+    /* Filter Bar */
+    .filter-bar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .filter-bar select,
+    .filter-bar input {
+      padding: 10px 14px;
+      background: var(--bg-dark);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 14px;
+    }
+
+    .filter-bar select:focus,
+    .filter-bar input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    /* Action buttons in tables */
+    .action-btn {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+
+    .action-btn:hover {
+      background: var(--bg-card-hover);
+      color: var(--text-primary);
+    }
+
+    .action-btn.edit:hover {
+      color: var(--accent);
+    }
+
+    .action-btn.delete:hover {
+      color: var(--danger);
+    }
+  </style>
+</head>
+<body>
+  <!-- Login Screen -->
+  <div class="login-container" id="loginScreen">
+    <div class="login-box">
+      <div class="login-logo">SitePunch</div>
+      <div class="login-subtitle">Admin Dashboard</div>
+      
+      <div class="error-message" id="loginError" style="display: none;"></div>
+      
+      <form id="loginForm">
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-input" id="loginEmail" required placeholder="admin@company.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" class="form-input" id="loginPassword" required placeholder="••••••••">
+        </div>
+        <button type="submit" class="btn btn-primary" id="loginBtn">
+          Sign In
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div class="dashboard" id="dashboard">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">SitePunch</div>
+      
+      <ul class="sidebar-nav">
+        <li class="nav-item active" data-page="dashboard">
+          <span class="nav-icon">📊</span>
+          Dashboard
+        </li>
+        <li class="nav-item" data-page="employees">
+          <span class="nav-icon">👥</span>
+          Employees
+        </li>
+        <li class="nav-item" data-page="time-entries">
+          <span class="nav-icon">⏱️</span>
+          Time Entries
+        </li>
+        <li class="nav-item" data-page="time-off">
+          <span class="nav-icon">📅</span>
+          Time Off Requests
+        </li>
+        <li class="nav-item" data-page="incidents">
+          <span class="nav-icon">⚠️</span>
+          Incidents
+        </li>
+        <li class="nav-item" data-page="policies">
+          <span class="nav-icon">📋</span>
+          Policies
+        </li>
+        <li class="nav-item" data-page="settings">
+          <span class="nav-icon">⚙️</span>
+          Settings
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <div class="user-info">
+          <div class="user-avatar" id="userAvatar">A</div>
+          <div>
+            <div class="user-name" id="userName">Admin</div>
+            <div class="user-role" id="userRole">Owner</div>
+          </div>
+        </div>
+        <button class="logout-btn" id="logoutBtn">Sign Out</button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Dashboard Page -->
+      <section class="page-section active" id="page-dashboard">
+        <div class="page-header">
+          <h1 class="page-title">Dashboard</h1>
+          <p class="page-subtitle">Overview of today's activity</p>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Clocked In Now</div>
+            <div class="stat-value success" id="statClockedIn">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Total Employees</div>
+            <div class="stat-value" id="statTotalEmployees">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Pending Time Off</div>
+            <div class="stat-value warning" id="statPendingTimeOff">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Open Incidents</div>
+            <div class="stat-value danger" id="statOpenIncidents">0</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Recent Activity</h3>
+          </div>
+          <div class="card-body" id="activityFeed">
+            <div class="empty-state">
+              <div class="empty-state-icon">📭</div>
+              <p>No recent activity</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Employees Page -->
+      <section class="page-section" id="page-employees">
+        <div class="page-header">
+          <h1 class="page-title">Employees</h1>
+          <p class="page-subtitle">Manage your team</p>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">All Employees</h3>
+            <button class="btn btn-primary btn-small" onclick="openModal('addEmployee')">+ Add Employee</button>
+          </div>
+          <div style="overflow-x: auto;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Employee ID</th>
+                  <th>Department</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="employeesTable">
+                <tr>
+                  <td colspan="5" class="empty-state">Loading...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Time Entries Page -->
+      <section class="page-section" id="page-time-entries">
+        <div class="page-header">
+          <h1 class="page-title">Time Entries</h1>
+          <p class="page-subtitle">View and manage time records</p>
+        </div>
+
+        <div class="filter-bar">
+          <input type="date" id="filterDate" onchange="loadTimeEntries()">
+          <select id="filterEmployee" onchange="loadTimeEntries()">
+            <option value="">All Employees</option>
+          </select>
+          <button class="btn btn-secondary btn-small" onclick="exportTimeEntries()">Export CSV</button>
+        </div>
+
+        <div class="card">
+          <div style="overflow-x: auto;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Employee</th>
+                  <th>Date</th>
+                  <th>Clock In</th>
+                  <th>Clock Out</th>
+                  <th>Hours</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="timeEntriesTable">
+                <tr>
+                  <td colspan="6" class="empty-state">Loading...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Time Off Page -->
+      <section class="page-section" id="page-time-off">
+        <div class="page-header">
+          <h1 class="page-title">Time Off Requests</h1>
+          <p class="page-subtitle">Review and approve requests</p>
+        </div>
+
+        <div class="card">
+          <div style="overflow-x: auto;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Employee</th>
+                  <th>Type</th>
+                  <th>Start Date</th>
+                  <th>End Date</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="timeOffTable">
+                <tr>
+                  <td colspan="6" class="empty-state">Loading...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Incidents Page -->
+      <section class="page-section" id="page-incidents">
+        <div class="page-header">
+          <h1 class="page-title">Incidents</h1>
+          <p class="page-subtitle">Safety reports and incidents</p>
+        </div>
+
+        <div class="card">
+          <div style="overflow-x: auto;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Reported By</th>
+                  <th>Type</th>
+                  <th>Severity</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="incidentsTable">
+                <tr>
+                  <td colspan="6" class="empty-state">Loading...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Policies Page -->
+      <section class="page-section" id="page-policies">
+        <div class="page-header">
+          <h1 class="page-title">Policies</h1>
+          <p class="page-subtitle">Company policies and acknowledgments</p>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">All Policies</h3>
+            <button class="btn btn-primary btn-small" onclick="openModal('addPolicy')">+ Add Policy</button>
+          </div>
+          <div style="overflow-x: auto;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Required</th>
+                  <th>Acknowledgments</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="policiesTable">
+                <tr>
+                  <td colspan="5" class="empty-state">Loading...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Settings Page -->
+      <section class="page-section" id="page-settings">
+        <div class="page-header">
+          <h1 class="page-title">Settings</h1>
+          <p class="page-subtitle">Company configuration</p>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Company Settings</h3>
+          </div>
+          <div class="card-body">
+            <form id="settingsForm">
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Company Name</label>
+                  <input type="text" class="form-input" id="settingCompanyName">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Timezone</label>
+                  <select class="form-input" id="settingTimezone">
+                    <option value="America/Chicago">Central Time (Chicago)</option>
+                    <option value="America/New_York">Eastern Time (New York)</option>
+                    <option value="America/Denver">Mountain Time (Denver)</option>
+                    <option value="America/Los_Angeles">Pacific Time (Los Angeles)</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Overtime Threshold (hours/week)</label>
+                  <input type="number" class="form-input" id="settingOvertimeThreshold" value="40">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Pay Period</label>
+                  <select class="form-input" id="settingPayPeriod">
+                    <option value="weekly">Weekly</option>
+                    <option value="biweekly">Bi-weekly</option>
+                    <option value="semimonthly">Semi-monthly</option>
+                    <option value="monthly">Monthly</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Save Settings</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">QuickBooks Integration</h3>
+          </div>
+          <div class="card-body">
+            <p style="color: var(--text-secondary); margin-bottom: 16px;">
+              Connect to QuickBooks Online to sync employee time data for payroll.
+            </p>
+            <button class="btn btn-secondary" id="qbConnectBtn" onclick="connectQuickBooks()">
+              Connect QuickBooks
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Add Employee Modal -->
+  <div class="modal-overlay" id="modal-addEmployee">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Add Employee</h3>
+        <button class="modal-close" onclick="closeModal('addEmployee')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="addEmployeeForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">First Name</label>
+              <input type="text" class="form-input" name="firstName" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Last Name</label>
+              <input type="text" class="form-input" name="lastName" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Employee ID</label>
+              <input type="text" class="form-input" name="employeeId" required placeholder="e.g., 001">
+            </div>
+            <div class="form-group">
+              <label class="form-label">PIN (4 digits)</label>
+              <input type="text" class="form-input" name="pin" required pattern="[0-9]{4}" maxlength="4" placeholder="e.g., 1234">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-input" name="email">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone</label>
+              <input type="tel" class="form-input" name="phone">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Department</label>
+            <select class="form-input" name="department">
+              <option value="Field">Field</option>
+              <option value="Office">Office</option>
+              <option value="Management">Management</option>
+            </select>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('addEmployee')">Cancel</button>
+            <button type="submit" class="btn btn-primary">Add Employee</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Policy Modal -->
+  <div class="modal-overlay" id="modal-addPolicy">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Add Policy</h3>
+        <button class="modal-close" onclick="closeModal('addPolicy')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="addPolicyForm">
+          <div class="form-group">
+            <label class="form-label">Policy Title</label>
+            <input type="text" class="form-input" name="title" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <input type="text" class="form-input" name="description">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Content</label>
+            <textarea class="form-input" name="content" rows="5" required style="resize: vertical;"></textarea>
+          </div>
+          <div class="form-group">
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+              <input type="checkbox" name="required" checked>
+              <span>Require acknowledgment from all employees</span>
+            </label>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('addPolicy')">Cancel</button>
+            <button type="submit" class="btn btn-primary">Add Policy</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- View Incident Modal -->
+  <div class="modal-overlay" id="modal-viewIncident">
+    <div class="modal" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Incident Details</h3>
+        <button class="modal-close" onclick="closeModal('viewIncident')">&times;</button>
+      </div>
+      <div class="modal-body" id="incidentDetails">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Configuration
+    const API_BASE = '/.netlify/functions';
+    
+    // State
+    let authToken = localStorage.getItem('adminToken');
+    let currentUser = JSON.parse(localStorage.getItem('adminUser') || 'null');
+    let companyId = localStorage.getItem('companyId');
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      if (authToken && currentUser) {
+        showDashboard();
+        loadDashboardData();
+      } else {
+        showLogin();
+      }
+
+      // Set up navigation
+      document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const page = item.dataset.page;
+          navigateTo(page);
+        });
+      });
+
+      // Set up forms
+      document.getElementById('loginForm').addEventListener('submit', handleLogin);
+      document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+      document.getElementById('addEmployeeForm').addEventListener('submit', handleAddEmployee);
+      document.getElementById('addPolicyForm').addEventListener('submit', handleAddPolicy);
+      document.getElementById('settingsForm').addEventListener('submit', handleSaveSettings);
+
+      // Set default date filter to today
+      document.getElementById('filterDate').valueAsDate = new Date();
+    });
+
+    // Navigation
+    function navigateTo(page) {
+      document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.toggle('active', item.dataset.page === page);
+      });
+      
+      document.querySelectorAll('.page-section').forEach(section => {
+        section.classList.toggle('active', section.id === `page-${page}`);
+      });
+
+      // Load data for the page
+      switch(page) {
+        case 'dashboard':
+          loadDashboardData();
+          break;
+        case 'employees':
+          loadEmployees();
+          break;
+        case 'time-entries':
+          loadTimeEntries();
+          break;
+        case 'time-off':
+          loadTimeOffRequests();
+          break;
+        case 'incidents':
+          loadIncidents();
+          break;
+        case 'policies':
+          loadPolicies();
+          break;
+        case 'settings':
+          loadSettings();
+          break;
+      }
+    }
+
+    // Auth
+    function showLogin() {
+      document.getElementById('loginScreen').style.display = 'flex';
+      document.getElementById('dashboard').style.display = 'none';
+    }
+
+    function showDashboard() {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+      
+      if (currentUser) {
+        document.getElementById('userName').textContent = `${currentUser.firstName} ${currentUser.lastName}`;
+        document.getElementById('userRole').textContent = currentUser.role || 'Admin';
+        document.getElementById('userAvatar').textContent = currentUser.firstName?.[0] || 'A';
+      }
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+      const btn = document.getElementById('loginBtn');
+      const errorEl = document.getElementById('loginError');
+
+      btn.disabled = true;
+      btn.innerHTML = '<div class="spinner"></div>';
+      errorEl.style.display = 'none';
+
+      try {
+        const res = await fetch(`${API_BASE}/admin-login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          authToken = data.token;
+          currentUser = data.admin;
+          companyId = data.admin.companyId;
+          
+          localStorage.setItem('adminToken', authToken);
+          localStorage.setItem('adminUser', JSON.stringify(currentUser));
+          localStorage.setItem('companyId', companyId);
+
+          showDashboard();
+          loadDashboardData();
+        } else {
+          errorEl.textContent = data.error || 'Login failed';
+          errorEl.style.display = 'block';
+        }
+      } catch (err) {
+        errorEl.textContent = 'Connection error. Please try again.';
+        errorEl.style.display = 'block';
+      }
+
+      btn.disabled = false;
+      btn.textContent = 'Sign In';
+    }
+
+    function handleLogout() {
+      localStorage.removeItem('adminToken');
+      localStorage.removeItem('adminUser');
+      localStorage.removeItem('companyId');
+      authToken = null;
+      currentUser = null;
+      companyId = null;
+      showLogin();
+    }
+
+    // API Helper
+    async function apiCall(endpoint, options = {}) {
+      const res = await fetch(`${API_BASE}${endpoint}`, {
+        ...options,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`,
+          ...options.headers
+        }
+      });
+      return res.json();
+    }
+
+    // Dashboard
+    async function loadDashboardData() {
+      try {
+        const data = await apiCall('/admin-dashboard');
+        
+        if (data.success) {
+          document.getElementById('statClockedIn').textContent = data.stats.clockedIn || 0;
+          document.getElementById('statTotalEmployees').textContent = data.stats.totalEmployees || 0;
+          document.getElementById('statPendingTimeOff').textContent = data.stats.pendingTimeOff || 0;
+          document.getElementById('statOpenIncidents').textContent = data.stats.openIncidents || 0;
+
+          // Render activity feed
+          const feedEl = document.getElementById('activityFeed');
+          if (data.recentActivity && data.recentActivity.length > 0) {
+            feedEl.innerHTML = data.recentActivity.map(activity => `
+              <div class="activity-item">
+                <div class="activity-icon ${activity.type}">
+                  ${activity.type === 'clock-in' ? '▶' : activity.type === 'clock-out' ? '⏹' : '⚠'}
+                </div>
+                <div class="activity-text">
+                  <div class="activity-title">${activity.description}</div>
+                  <div class="activity-time">${formatTime(activity.timestamp)}</div>
+                </div>
+              </div>
+            `).join('');
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load dashboard:', err);
+      }
+    }
+
+    // Employees
+    async function loadEmployees() {
+      try {
+        const data = await apiCall('/admin-employees');
+        const tbody = document.getElementById('employeesTable');
+        const filterSelect = document.getElementById('filterEmployee');
+
+        if (data.success && data.employees.length > 0) {
+          tbody.innerHTML = data.employees.map(emp => `
+            <tr>
+              <td><strong>${emp.firstName} ${emp.lastName}</strong></td>
+              <td>${emp.employeeId}</td>
+              <td>${emp.department || '-'}</td>
+              <td>
+                <span class="badge ${emp.active ? 'badge-success' : 'badge-danger'}">
+                  ${emp.active ? 'Active' : 'Inactive'}
+                </span>
+              </td>
+              <td>
+                <button class="action-btn edit" onclick="editEmployee('${emp._id}')">✏️</button>
+                <button class="action-btn delete" onclick="deactivateEmployee('${emp._id}')">🗑️</button>
+              </td>
+            </tr>
+          `).join('');
+
+          // Update filter dropdown
+          filterSelect.innerHTML = '<option value="">All Employees</option>' + 
+            data.employees.map(emp => `<option value="${emp._id}">${emp.firstName} ${emp.lastName}</option>`).join('');
+        } else {
+          tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No employees found</td></tr>';
+        }
+      } catch (err) {
+        console.error('Failed to load employees:', err);
+      }
+    }
+
+    async function handleAddEmployee(e) {
+      e.preventDefault();
+      const form = e.target;
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData);
+
+      try {
+        const res = await apiCall('/admin-employees', {
+          method: 'POST',
+          body: JSON.stringify(data)
+        });
+
+        if (res.success) {
+          closeModal('addEmployee');
+          form.reset();
+          loadEmployees();
+        } else {
+          alert(res.error || 'Failed to add employee');
+        }
+      } catch (err) {
+        alert('Error adding employee');
+      }
+    }
+
+    // Time Entries
+    async function loadTimeEntries() {
+      try {
+        const date = document.getElementById('filterDate').value;
+        const employeeId = document.getElementById('filterEmployee').value;
+        
+        let url = '/admin-time-entries';
+        const params = new URLSearchParams();
+        if (date) params.append('date', date);
+        if (employeeId) params.append('employeeId', employeeId);
+        if (params.toString()) url += '?' + params.toString();
+
+        const data = await apiCall(url);
+        const tbody = document.getElementById('timeEntriesTable');
+
+        if (data.success && data.entries.length > 0) {
+          tbody.innerHTML = data.entries.map(entry => `
+            <tr>
+              <td>${entry.employeeName || 'Unknown'}</td>
+              <td>${formatDate(entry.clockIn)}</td>
+              <td>${formatTime(entry.clockIn)}</td>
+              <td>${entry.clockOut ? formatTime(entry.clockOut) : '-'}</td>
+              <td>${entry.totalHours ? entry.totalHours.toFixed(2) : '-'}</td>
+              <td>
+                <span class="badge ${entry.clockOut ? 'badge-success' : 'badge-info'}">
+                  ${entry.clockOut ? 'Complete' : 'Active'}
+                </span>
+              </td>
+            </tr>
+          `).join('');
+        } else {
+          tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No time entries found</td></tr>';
+        }
+      } catch (err) {
+        console.error('Failed to load time entries:', err);
+      }
+    }
+
+    function exportTimeEntries() {
+      alert('Export feature coming soon - will integrate with QuickBooks');
+    }
+
+    // Time Off
+    async function loadTimeOffRequests() {
+      try {
+        const data = await apiCall('/admin-time-off');
+        const tbody = document.getElementById('timeOffTable');
+
+        if (data.success && data.requests.length > 0) {
+          tbody.innerHTML = data.requests.map(req => `
+            <tr>
+              <td>${req.employeeName || 'Unknown'}</td>
+              <td>${req.type}</td>
+              <td>${formatDate(req.startDate)}</td>
+              <td>${formatDate(req.endDate)}</td>
+              <td>
+                <span class="badge badge-${req.status === 'approved' ? 'success' : req.status === 'denied' ? 'danger' : 'warning'}">
+                  ${req.status}
+                </span>
+              </td>
+              <td>
+                ${req.status === 'pending' ? `
+                  <button class="btn btn-small" style="background: var(--success); color: white; margin-right: 8px;" onclick="approveTimeOff('${req._id}')">Approve</button>
+                  <button class="btn btn-small" style="background: var(--danger); color: white;" onclick="denyTimeOff('${req._id}')">Deny</button>
+                ` : '-'}
+              </td>
+            </tr>
+          `).join('');
+        } else {
+          tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No time off requests</td></tr>';
+        }
+      } catch (err) {
+        console.error('Failed to load time off requests:', err);
+      }
+    }
+
+    async function approveTimeOff(id) {
+      try {
+        const res = await apiCall(`/admin-time-off?id=${id}&action=approve`, { method: 'PUT' });
+        if (res.success) loadTimeOffRequests();
+      } catch (err) {
+        alert('Error approving request');
+      }
+    }
+
+    async function denyTimeOff(id) {
+      try {
+        const res = await apiCall(`/admin-time-off?id=${id}&action=deny`, { method: 'PUT' });
+        if (res.success) loadTimeOffRequests();
+      } catch (err) {
+        alert('Error denying request');
+      }
+    }
+
+    // Incidents
+    async function loadIncidents() {
+      try {
+        const data = await apiCall('/admin-incidents');
+        const tbody = document.getElementById('incidentsTable');
+
+        if (data.success && data.incidents.length > 0) {
+          tbody.innerHTML = data.incidents.map(inc => `
+            <tr>
+              <td>${formatDate(inc.createdAt)}</td>
+              <td>${inc.employeeName || 'Unknown'}</td>
+              <td>${inc.type}</td>
+              <td>
+                <span class="badge badge-${inc.severity === 'critical' ? 'danger' : inc.severity === 'high' ? 'warning' : 'info'}">
+                  ${inc.severity}
+                </span>
+              </td>
+              <td>
+                <span class="badge badge-${inc.status === 'resolved' ? 'success' : 'warning'}">
+                  ${inc.status || 'open'}
+                </span>
+              </td>
+              <td>
+                <button class="action-btn" onclick="viewIncident('${inc._id}')">👁️</button>
+              </td>
+            </tr>
+          `).join('');
+        } else {
+          tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No incidents reported</td></tr>';
+        }
+      } catch (err) {
+        console.error('Failed to load incidents:', err);
+      }
+    }
+
+    async function viewIncident(id) {
+      try {
+        const data = await apiCall(`/admin-incidents?id=${id}`);
+        if (data.success && data.incident) {
+          const inc = data.incident;
+          document.getElementById('incidentDetails').innerHTML = `
+            <div style="margin-bottom: 20px;">
+              <strong>Type:</strong> ${inc.type}<br>
+              <strong>Severity:</strong> ${inc.severity}<br>
+              <strong>Reported:</strong> ${formatDate(inc.createdAt)} at ${formatTime(inc.createdAt)}<br>
+              <strong>By:</strong> ${inc.employeeName || 'Unknown'}
+            </div>
+            <div style="margin-bottom: 20px;">
+              <strong>Description:</strong><br>
+              <p style="color: var(--text-secondary); margin-top: 8px;">${inc.description}</p>
+            </div>
+            ${inc.photos && inc.photos.length > 0 ? `
+              <div style="margin-bottom: 20px;">
+                <strong>Photos:</strong><br>
+                <div style="display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap;">
+                  ${inc.photos.map(photo => `<img src="${photo}" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px;">`).join('')}
+                </div>
+              </div>
+            ` : ''}
+            <div style="margin-bottom: 20px;">
+              <strong>Location:</strong><br>
+              <span style="color: var(--text-secondary);">
+                ${inc.location ? `${inc.location.latitude}, ${inc.location.longitude}` : 'Not recorded'}
+              </span>
+            </div>
+            <div class="form-actions">
+              <button class="btn btn-secondary" onclick="closeModal('viewIncident')">Close</button>
+              ${inc.status !== 'resolved' ? `
+                <button class="btn btn-primary" onclick="resolveIncident('${inc._id}')">Mark Resolved</button>
+              ` : ''}
+            </div>
+          `;
+          openModal('viewIncident');
+        }
+      } catch (err) {
+        alert('Error loading incident details');
+      }
+    }
+
+    async function resolveIncident(id) {
+      try {
+        const res = await apiCall(`/admin-incidents?id=${id}&action=resolve`, { method: 'PUT' });
+        if (res.success) {
+          closeModal('viewIncident');
+          loadIncidents();
+        }
+      } catch (err) {
+        alert('Error resolving incident');
+      }
+    }
+
+    // Policies
+    async function loadPolicies() {
+      try {
+        const data = await apiCall('/admin-policies');
+        const tbody = document.getElementById('policiesTable');
+
+        if (data.success && data.policies.length > 0) {
+          tbody.innerHTML = data.policies.map(policy => `
+            <tr>
+              <td><strong>${policy.title}</strong></td>
+              <td>${policy.required ? 'Yes' : 'No'}</td>
+              <td>${policy.acknowledgmentCount || 0} / ${policy.totalEmployees || 0}</td>
+              <td>
+                <span class="badge ${policy.active ? 'badge-success' : 'badge-danger'}">
+                  ${policy.active ? 'Active' : 'Inactive'}
+                </span>
+              </td>
+              <td>
+                <button class="action-btn edit" onclick="editPolicy('${policy._id}')">✏️</button>
+                <button class="action-btn delete" onclick="deletePolicy('${policy._id}')">🗑️</button>
+              </td>
+            </tr>
+          `).join('');
+        } else {
+          tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No policies found</td></tr>';
+        }
+      } catch (err) {
+        console.error('Failed to load policies:', err);
+      }
+    }
+
+    async function handleAddPolicy(e) {
+      e.preventDefault();
+      const form = e.target;
+      const formData = new FormData(form);
+      const data = {
+        title: formData.get('title'),
+        description: formData.get('description'),
+        content: formData.get('content'),
+        required: formData.get('required') === 'on'
+      };
+
+      try {
+        const res = await apiCall('/admin-policies', {
+          method: 'POST',
+          body: JSON.stringify(data)
+        });
+
+        if (res.success) {
+          closeModal('addPolicy');
+          form.reset();
+          loadPolicies();
+        } else {
+          alert(res.error || 'Failed to add policy');
+        }
+      } catch (err) {
+        alert('Error adding policy');
+      }
+    }
+
+    // Settings
+    async function loadSettings() {
+      try {
+        const data = await apiCall('/admin-settings');
+        if (data.success && data.settings) {
+          document.getElementById('settingCompanyName').value = data.settings.name || '';
+          document.getElementById('settingTimezone').value = data.settings.timezone || 'America/Chicago';
+          document.getElementById('settingOvertimeThreshold').value = data.settings.overtimeThreshold || 40;
+          document.getElementById('settingPayPeriod').value = data.settings.payPeriodType || 'biweekly';
+        }
+      } catch (err) {
+        console.error('Failed to load settings:', err);
+      }
+    }
+
+    async function handleSaveSettings(e) {
+      e.preventDefault();
+      const settings = {
+        name: document.getElementById('settingCompanyName').value,
+        timezone: document.getElementById('settingTimezone').value,
+        overtimeThreshold: parseInt(document.getElementById('settingOvertimeThreshold').value),
+        payPeriodType: document.getElementById('settingPayPeriod').value
+      };
+
+      try {
+        const res = await apiCall('/admin-settings', {
+          method: 'PUT',
+          body: JSON.stringify(settings)
+        });
+
+        if (res.success) {
+          alert('Settings saved!');
+        } else {
+          alert(res.error || 'Failed to save settings');
+        }
+      } catch (err) {
+        alert('Error saving settings');
+      }
+    }
+
+    function connectQuickBooks() {
+      alert('QuickBooks integration coming soon!');
+    }
+
+    // Modal helpers
+    function openModal(name) {
+      document.getElementById(`modal-${name}`).classList.add('active');
+    }
+
+    function closeModal(name) {
+      document.getElementById(`modal-${name}`).classList.remove('active');
+    }
+
+    // Utility functions
+    function formatDate(dateStr) {
+      if (!dateStr) return '-';
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    function formatTime(dateStr) {
+      if (!dateStr) return '-';
+      const date = new Date(dateStr);
+      return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+    }
+
+    // Placeholder functions for edit/delete
+    function editEmployee(id) { alert('Edit employee: ' + id); }
+    function deactivateEmployee(id) { 
+      if (confirm('Deactivate this employee?')) {
+        alert('Deactivate: ' + id);
+      }
+    }
+    function editPolicy(id) { alert('Edit policy: ' + id); }
+    function deletePolicy(id) {
+      if (confirm('Delete this policy?')) {
+        alert('Delete: ' + id);
+      }
+    }
+  </script>
+</body>
+</html>
