@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SitePunch Admin</title>
+  <link rel="icon" type="image/png" href="/images/sitepunch-logo.png">
+  <link rel="apple-touch-icon" href="/images/sitepunch-logo.png">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -53,10 +55,21 @@
     }
 
     .login-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .login-logo img {
+      width: 48px;
+      height: 48px;
+    }
+
+    .login-logo-text {
       font-size: 32px;
       font-weight: 700;
       color: var(--accent);
-      margin-bottom: 8px;
     }
 
     .login-subtitle {
@@ -171,11 +184,22 @@
     }
 
     .sidebar-logo {
-      font-size: 24px;
-      font-weight: 700;
-      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 10px;
       padding: 0 24px;
       margin-bottom: 32px;
+    }
+
+    .sidebar-logo img {
+      width: 36px;
+      height: 36px;
+    }
+
+    .sidebar-logo-text {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--accent);
     }
 
     .sidebar-nav {
@@ -633,7 +657,10 @@
   <!-- Login Screen -->
   <div class="login-container" id="loginScreen">
     <div class="login-box">
-      <div class="login-logo">SitePunch</div>
+      <div class="login-logo">
+        <img src="/images/sitepunch-logo.png" alt="SitePunch">
+        <span class="login-logo-text">SitePunch</span>
+      </div>
       <div class="login-subtitle">Admin Dashboard</div>
       
       <div class="error-message" id="loginError" style="display: none;"></div>
@@ -658,7 +685,10 @@
   <div class="dashboard" id="dashboard">
     <!-- Sidebar -->
     <aside class="sidebar">
-      <div class="sidebar-logo">SitePunch</div>
+      <div class="sidebar-logo">
+        <img src="/images/sitepunch-logo.png" alt="SitePunch">
+        <span class="sidebar-logo-text">SitePunch</span>
+      </div>
       
       <ul class="sidebar-nav">
         <li class="nav-item active" data-page="dashboard">
