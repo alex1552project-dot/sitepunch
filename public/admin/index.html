@@ -1084,6 +1084,11 @@
             <textarea class="form-input" name="content" rows="5" required style="resize: vertical;"></textarea>
           </div>
           <div class="form-group">
+            <label class="form-label">Attachments (PDF, DOC, images)</label>
+            <input type="file" class="form-input" id="addPolicyAttachments" multiple accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" style="padding: 10px;">
+            <div id="addPolicyFileList" style="margin-top: 8px; font-size: 13px; color: var(--text-secondary);"></div>
+          </div>
+          <div class="form-group">
             <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
               <input type="checkbox" name="required" checked>
               <span>Require acknowledgment from all employees</span>
@@ -1193,6 +1198,15 @@
             <textarea class="form-input" id="editPolicyContent" rows="5" required style="resize: vertical;"></textarea>
           </div>
           <div class="form-group">
+            <label class="form-label">Current Attachments</label>
+            <div id="editPolicyCurrentAttachments" style="margin-top: 8px; font-size: 13px; color: var(--text-secondary);">No attachments</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Add New Attachments (PDF, DOC, images)</label>
+            <input type="file" class="form-input" id="editPolicyAttachments" multiple accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" style="padding: 10px;">
+            <div id="editPolicyFileList" style="margin-top: 8px; font-size: 13px; color: var(--text-secondary);"></div>
+          </div>
+          <div class="form-group">
             <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
               <input type="checkbox" id="editPolicyRequired">
               <span>Require acknowledgment from all employees</span>
@@ -1285,6 +1299,25 @@
       document.getElementById('editEmployeeForm').addEventListener('submit', handleEditEmployee);
       document.getElementById('editPolicyForm').addEventListener('submit', handleEditPolicy);
       document.getElementById('editTimeEntryForm').addEventListener('submit', handleEditTimeEntry);
+
+      // File input change listeners
+      document.getElementById('addPolicyAttachments').addEventListener('change', function(e) {
+        const fileList = document.getElementById('addPolicyFileList');
+        if (this.files.length > 0) {
+          fileList.innerHTML = Array.from(this.files).map(f => `<div>📎 ${f.name} (${(f.size/1024).toFixed(1)} KB)</div>`).join('');
+        } else {
+          fileList.innerHTML = '';
+        }
+      });
+
+      document.getElementById('editPolicyAttachments').addEventListener('change', function(e) {
+        const fileList = document.getElementById('editPolicyFileList');
+        if (this.files.length > 0) {
+          fileList.innerHTML = '<strong>New files to add:</strong><br>' + Array.from(this.files).map(f => `<div>📎 ${f.name} (${(f.size/1024).toFixed(1)} KB)</div>`).join('');
+        } else {
+          fileList.innerHTML = '';
+        }
+      });
 
       // Set default date filter to today
       document.getElementById('filterDate').valueAsDate = new Date();
@@ -1699,7 +1732,10 @@
         if (data.success && data.policies.length > 0) {
           tbody.innerHTML = data.policies.map(policy => `
             <tr>
-              <td><strong>${policy.title}</strong></td>
+              <td>
+                <strong>${policy.title}</strong>
+                ${policy.attachments && policy.attachments.length > 0 ? `<span style="color: var(--text-muted); font-size: 12px; margin-left: 8px;">📎 ${policy.attachments.length} file(s)</span>` : ''}
+              </td>
               <td>${policy.required ? 'Yes' : 'No'}</td>
               <td>${policy.acknowledgmentCount || 0} / ${policy.totalEmployees || 0}</td>
               <td>
@@ -1725,11 +1761,28 @@
       e.preventDefault();
       const form = e.target;
       const formData = new FormData(form);
+      
+      // Convert attachments to base64
+      const attachments = [];
+      const fileInput = document.getElementById('addPolicyAttachments');
+      if (fileInput.files.length > 0) {
+        for (const file of fileInput.files) {
+          const base64 = await fileToBase64(file);
+          attachments.push({
+            name: file.name,
+            type: file.type,
+            size: file.size,
+            data: base64
+          });
+        }
+      }
+
       const data = {
         title: formData.get('title'),
         description: formData.get('description'),
         content: formData.get('content'),
-        required: formData.get('required') === 'on'
+        required: formData.get('required') === 'on',
+        attachments: attachments
       };
 
       try {
@@ -1741,6 +1794,7 @@
         if (res.success) {
           closeModal('addPolicy');
           form.reset();
+          document.getElementById('addPolicyFileList').innerHTML = '';
           loadPolicies();
         } else {
           alert(res.error || 'Failed to add policy');
@@ -1748,6 +1802,16 @@
       } catch (err) {
         alert('Error adding policy');
       }
+    }
+
+    // Helper function to convert file to base64
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+      });
     }
 
     // Settings
@@ -1907,6 +1971,25 @@
             document.getElementById('editPolicyContent').value = policy.content || '';
             document.getElementById('editPolicyRequired').checked = policy.required !== false;
             document.getElementById('editPolicyActive').checked = policy.active !== false;
+            
+            // Display current attachments
+            const attachmentsDiv = document.getElementById('editPolicyCurrentAttachments');
+            if (policy.attachments && policy.attachments.length > 0) {
+              attachmentsDiv.innerHTML = policy.attachments.map((att, idx) => `
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                  <span>📎 ${att.name}</span>
+                  <a href="${att.data}" download="${att.name}" style="color: var(--accent); font-size: 12px;">Download</a>
+                  <button type="button" onclick="removeAttachment(${idx})" style="background: none; border: none; color: var(--danger); cursor: pointer; font-size: 12px;">Remove</button>
+                </div>
+              `).join('');
+            } else {
+              attachmentsDiv.innerHTML = 'No attachments';
+            }
+            
+            // Clear new attachments input
+            document.getElementById('editPolicyAttachments').value = '';
+            document.getElementById('editPolicyFileList').innerHTML = '';
+            
             openModal('editPolicy');
           }
         }
@@ -1915,15 +1998,53 @@
       }
     }
 
+    function removeAttachment(index) {
+      if (currentEditPolicy && currentEditPolicy.attachments) {
+        currentEditPolicy.attachments.splice(index, 1);
+        // Refresh display
+        const attachmentsDiv = document.getElementById('editPolicyCurrentAttachments');
+        if (currentEditPolicy.attachments.length > 0) {
+          attachmentsDiv.innerHTML = currentEditPolicy.attachments.map((att, idx) => `
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+              <span>📎 ${att.name}</span>
+              <a href="${att.data}" download="${att.name}" style="color: var(--accent); font-size: 12px;">Download</a>
+              <button type="button" onclick="removeAttachment(${idx})" style="background: none; border: none; color: var(--danger); cursor: pointer; font-size: 12px;">Remove</button>
+            </div>
+          `).join('');
+        } else {
+          attachmentsDiv.innerHTML = 'No attachments';
+        }
+      }
+    }
+
     async function handleEditPolicy(e) {
       e.preventDefault();
       const id = document.getElementById('editPolicyId').value;
+      
+      // Get existing attachments (possibly modified by removals)
+      let attachments = currentEditPolicy.attachments || [];
+      
+      // Add new attachments
+      const fileInput = document.getElementById('editPolicyAttachments');
+      if (fileInput.files.length > 0) {
+        for (const file of fileInput.files) {
+          const base64 = await fileToBase64(file);
+          attachments.push({
+            name: file.name,
+            type: file.type,
+            size: file.size,
+            data: base64
+          });
+        }
+      }
+
       const data = {
         title: document.getElementById('editPolicyTitle').value,
         description: document.getElementById('editPolicyDescription').value,
         content: document.getElementById('editPolicyContent').value,
         required: document.getElementById('editPolicyRequired').checked,
-        active: document.getElementById('editPolicyActive').checked
+        active: document.getElementById('editPolicyActive').checked,
+        attachments: attachments
       };
 
       try {

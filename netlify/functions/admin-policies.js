@@ -93,6 +93,7 @@ exports.handler = async (event) => {
         title: data.title,
         description: data.description || '',
         content: data.content,
+        attachments: data.attachments || [],
         required: data.required !== false,
         active: true,
         effectiveDate: new Date(),
@@ -130,6 +131,7 @@ exports.handler = async (event) => {
       if (data.content) updateFields.content = data.content;
       if (data.required !== undefined) updateFields.required = data.required;
       if (data.active !== undefined) updateFields.active = data.active;
+      if (data.attachments !== undefined) updateFields.attachments = data.attachments;
 
       await db.collection('policies').updateOne(
         { _id: new ObjectId(policyId), companyId: companyId },
