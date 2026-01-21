@@ -15,19 +15,22 @@ import {
   ScrollView,
   Linking,
   Platform,
+  Image,
 } from 'react-native';
 import * as Location from 'expo-location';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
+const logo = require('../assets/sitepunch-logo.png');
+
 export default function HomeScreen({ navigation }) {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [isClockingIn, setIsClockingIn] = useState(false);
   const [isClockingOut, setIsClockingOut] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [locationPermission, setLocationPermission] = useState(null);
-
+  
   const [clockStatus, setClockStatus] = useState({
     isClockedIn: false,
     currentEntry: null,
@@ -39,7 +42,6 @@ export default function HomeScreen({ navigation }) {
   });
   const [pendingPolicies, setPendingPolicies] = useState([]);
 
-  // Check location permission on mount
   useEffect(() => {
     checkLocationPermission();
     loadData();
@@ -49,7 +51,7 @@ export default function HomeScreen({ navigation }) {
     try {
       const { status } = await Location.getForegroundPermissionsAsync();
       setLocationPermission(status);
-
+      
       if (status === 'undetermined') {
         const { status: newStatus } = await Location.requestForegroundPermissionsAsync();
         setLocationPermission(newStatus);
@@ -101,13 +103,13 @@ export default function HomeScreen({ navigation }) {
   const getLocation = async () => {
     try {
       let { status } = await Location.getForegroundPermissionsAsync();
-
+      
       if (status === 'undetermined') {
         const result = await Location.requestForegroundPermissionsAsync();
         status = result.status;
         setLocationPermission(status);
       }
-
+      
       if (status !== 'granted') {
         setLocationPermission(status);
         Alert.alert(
@@ -183,7 +185,7 @@ export default function HomeScreen({ navigation }) {
         await loadData();
         Alert.alert('Clocked Out', 'Any injuries or incidents to report?', [
           { text: 'No', style: 'cancel' },
-          { text: 'Report Incident', onPress: () => navigation.navigate('Report') },
+          { text: 'Report Incident', onPress: () => navigation.navigate('ReportIncident') },
         ]);
       } else {
         Alert.alert('Error', result.error || 'Failed to clock out');
@@ -203,16 +205,12 @@ export default function HomeScreen({ navigation }) {
   };
 
   const today = new Date();
-  const dateString = today.toLocaleDateString('en-US', {
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric',
-  });
+  const dateString = today.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#2563eb" />
+        <ActivityIndicator size="large" color="#3b82f6" />
       </View>
     );
   }
@@ -224,7 +222,11 @@ export default function HomeScreen({ navigation }) {
     >
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.greeting}>Hello, {user?.firstName || 'Worker'}! 👋</Text>
+        <View style={styles.headerTop}>
+          <Image source={logo} style={styles.headerLogo} resizeMode="contain" />
+          <Text style={styles.headerTitle}>SitePunch</Text>
+        </View>
+        <Text style={styles.greeting}>Hello, {user?.firstName || 'Team Member'}! 👋</Text>
         <Text style={styles.date}>{dateString}</Text>
       </View>
 
@@ -241,13 +243,9 @@ export default function HomeScreen({ navigation }) {
 
       {/* Clock Status */}
       <View style={[styles.statusCard, clockStatus.isClockedIn && styles.statusCardActive]}>
-        <Text style={styles.statusText}>
-          {clockStatus.isClockedIn ? 'Clocked In' : 'Not Clocked In'}
-        </Text>
+        <Text style={styles.statusText}>{clockStatus.isClockedIn ? 'Clocked In' : 'Not Clocked In'}</Text>
         {clockStatus.isClockedIn && clockStatus.currentDuration && (
-          <Text style={styles.durationText}>
-            Working: {formatDuration(clockStatus.currentDuration.minutes)}
-          </Text>
+          <Text style={styles.durationText}>Working: {formatDuration(clockStatus.currentDuration.minutes)}</Text>
         )}
       </View>
 
@@ -257,7 +255,7 @@ export default function HomeScreen({ navigation }) {
         onPress={clockStatus.isClockedIn ? handleClockOut : handleClockIn}
         disabled={isClockingIn || isClockingOut}
       >
-        {isClockingIn || isClockingOut ? (
+        {(isClockingIn || isClockingOut) ? (
           <ActivityIndicator color="#fff" />
         ) : (
           <Text style={styles.clockBtnText}>
@@ -276,45 +274,44 @@ export default function HomeScreen({ navigation }) {
       {pendingPolicies.length > 0 && (
         <View style={styles.alertCard}>
           <Text style={styles.alertTitle}>⚠️ Action Required</Text>
-          <Text style={styles.alertText}>
-            {pendingPolicies.length} policy acknowledgment(s) pending
-          </Text>
+          <Text style={styles.alertText}>{pendingPolicies.length} policy acknowledgment(s) pending</Text>
           <TouchableOpacity style={styles.alertBtn} onPress={() => navigation.navigate('Policies')}>
             <Text style={styles.alertBtnText}>Review Policies</Text>
           </TouchableOpacity>
         </View>
       )}
-
-      <View style={{ height: 20 }} />
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f3f4f6' },
-  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f3f4f6' },
-  header: { backgroundColor: '#2563eb', padding: 24, paddingTop: 60 },
-  greeting: { fontSize: 28, fontWeight: 'bold', color: '#fff' },
-  date: { fontSize: 16, color: '#bfdbfe', marginTop: 4 },
-  warningCard: { margin: 20, padding: 16, backgroundColor: '#fef3c7', borderRadius: 12 },
-  warningTitle: { fontSize: 16, fontWeight: '600', color: '#92400e' },
-  warningText: { fontSize: 14, color: '#a16207', marginTop: 4 },
+  container: { flex: 1, backgroundColor: '#0f1419' },
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#0f1419' },
+  header: { backgroundColor: '#1a1f2e', padding: 24, paddingTop: 60, borderBottomWidth: 1, borderBottomColor: '#2d3748' },
+  headerTop: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
+  headerLogo: { width: 40, height: 40, marginRight: 10 },
+  headerTitle: { fontSize: 24, fontWeight: '700', color: '#3b82f6' },
+  greeting: { fontSize: 24, fontWeight: 'bold', color: '#f1f5f9' },
+  date: { fontSize: 16, color: '#94a3b8', marginTop: 4 },
+  warningCard: { margin: 20, padding: 16, backgroundColor: 'rgba(245, 158, 11, 0.15)', borderRadius: 12, borderWidth: 1, borderColor: '#f59e0b' },
+  warningTitle: { fontSize: 16, fontWeight: '600', color: '#f59e0b' },
+  warningText: { fontSize: 14, color: '#fbbf24', marginTop: 4 },
   warningBtn: { marginTop: 12, backgroundColor: '#f59e0b', padding: 10, borderRadius: 8, alignItems: 'center' },
   warningBtnText: { color: '#fff', fontWeight: '600' },
-  statusCard: { margin: 20, padding: 20, backgroundColor: '#fff', borderRadius: 12, alignItems: 'center', borderWidth: 1, borderColor: '#e5e7eb' },
-  statusCardActive: { backgroundColor: '#dcfce7', borderColor: '#22c55e', borderWidth: 2 },
-  statusText: { fontSize: 22, fontWeight: 'bold', color: '#1f2937' },
-  durationText: { fontSize: 16, color: '#6b7280', marginTop: 8 },
-  clockBtn: { marginHorizontal: 20, padding: 18, borderRadius: 12, alignItems: 'center' },
+  statusCard: { margin: 20, padding: 24, backgroundColor: '#1a1f2e', borderRadius: 12, alignItems: 'center', borderWidth: 1, borderColor: '#2d3748' },
+  statusCardActive: { backgroundColor: 'rgba(34, 197, 94, 0.15)', borderColor: '#22c55e', borderWidth: 2 },
+  statusText: { fontSize: 24, fontWeight: 'bold', color: '#f1f5f9' },
+  durationText: { fontSize: 16, color: '#94a3b8', marginTop: 8 },
+  clockBtn: { marginHorizontal: 20, padding: 20, borderRadius: 12, alignItems: 'center' },
   clockInBtn: { backgroundColor: '#22c55e' },
   clockOutBtn: { backgroundColor: '#ef4444' },
-  clockBtnText: { color: '#fff', fontSize: 20, fontWeight: '600' },
-  statsCard: { margin: 20, padding: 20, backgroundColor: '#fff', borderRadius: 12 },
-  statsLabel: { fontSize: 14, color: '#6b7280' },
-  statsValue: { fontSize: 32, fontWeight: 'bold', color: '#1f2937', marginTop: 4 },
-  alertCard: { margin: 20, padding: 16, backgroundColor: '#fef3c7', borderRadius: 12 },
-  alertTitle: { fontSize: 16, fontWeight: '600', color: '#92400e' },
-  alertText: { fontSize: 14, color: '#a16207', marginTop: 4 },
+  clockBtnText: { color: '#fff', fontSize: 22, fontWeight: '600' },
+  statsCard: { margin: 20, padding: 24, backgroundColor: '#1a1f2e', borderRadius: 12, borderWidth: 1, borderColor: '#2d3748' },
+  statsLabel: { fontSize: 14, color: '#94a3b8' },
+  statsValue: { fontSize: 36, fontWeight: 'bold', color: '#f1f5f9', marginTop: 4 },
+  alertCard: { margin: 20, padding: 16, backgroundColor: 'rgba(245, 158, 11, 0.15)', borderRadius: 12, borderWidth: 1, borderColor: '#f59e0b' },
+  alertTitle: { fontSize: 16, fontWeight: '600', color: '#f59e0b' },
+  alertText: { fontSize: 14, color: '#fbbf24', marginTop: 4 },
   alertBtn: { marginTop: 12, backgroundColor: '#f59e0b', padding: 12, borderRadius: 8, alignItems: 'center' },
   alertBtnText: { color: '#fff', fontWeight: '600' },
 });
