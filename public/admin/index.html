@@ -833,11 +833,12 @@
                   <th>Clock Out</th>
                   <th>Hours</th>
                   <th>Status</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody id="timeEntriesTable">
                 <tr>
-                  <td colspan="6" class="empty-state">Loading...</td>
+                  <td colspan="7" class="empty-state">Loading...</td>
                 </tr>
               </tbody>
             </table>
@@ -1110,6 +1111,145 @@
     </div>
   </div>
 
+  <!-- Edit Employee Modal -->
+  <div class="modal-overlay" id="modal-editEmployee">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Edit Employee</h3>
+        <button class="modal-close" onclick="closeModal('editEmployee')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="editEmployeeForm">
+          <input type="hidden" id="editEmployeeId">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">First Name</label>
+              <input type="text" class="form-input" id="editFirstName" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Last Name</label>
+              <input type="text" class="form-input" id="editLastName" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-input" id="editEmail">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone</label>
+              <input type="tel" class="form-input" id="editPhone">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Department</label>
+              <select class="form-input" id="editDepartment">
+                <option value="Field">Field</option>
+                <option value="Office">Office</option>
+                <option value="Management">Management</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">New PIN (leave blank to keep current)</label>
+              <input type="text" class="form-input" id="editPin" pattern="[0-9]{4}" maxlength="4" placeholder="••••">
+            </div>
+          </div>
+          <div class="form-group">
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+              <input type="checkbox" id="editActive" checked>
+              <span>Active Employee</span>
+            </label>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('editEmployee')">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Policy Modal -->
+  <div class="modal-overlay" id="modal-editPolicy">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Edit Policy</h3>
+        <button class="modal-close" onclick="closeModal('editPolicy')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="editPolicyForm">
+          <input type="hidden" id="editPolicyId">
+          <div class="form-group">
+            <label class="form-label">Policy Title</label>
+            <input type="text" class="form-input" id="editPolicyTitle" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <input type="text" class="form-input" id="editPolicyDescription">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Content</label>
+            <textarea class="form-input" id="editPolicyContent" rows="5" required style="resize: vertical;"></textarea>
+          </div>
+          <div class="form-group">
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+              <input type="checkbox" id="editPolicyRequired">
+              <span>Require acknowledgment from all employees</span>
+            </label>
+          </div>
+          <div class="form-group">
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+              <input type="checkbox" id="editPolicyActive" checked>
+              <span>Active Policy</span>
+            </label>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('editPolicy')">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Time Entry Modal -->
+  <div class="modal-overlay" id="modal-editTimeEntry">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Edit Time Entry</h3>
+        <button class="modal-close" onclick="closeModal('editTimeEntry')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="editTimeEntryForm">
+          <input type="hidden" id="editTimeEntryId">
+          <div class="form-group">
+            <label class="form-label">Employee</label>
+            <input type="text" class="form-input" id="editTimeEntryEmployee" disabled>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Clock In</label>
+              <input type="datetime-local" class="form-input" id="editClockIn" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Clock Out</label>
+              <input type="datetime-local" class="form-input" id="editClockOut">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Admin Notes</label>
+            <textarea class="form-input" id="editTimeEntryNotes" rows="2" placeholder="Reason for adjustment..." style="resize: vertical;"></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('editTimeEntry')">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <script>
     // Configuration
     const API_BASE = '/.netlify/functions';
@@ -1142,6 +1282,9 @@
       document.getElementById('addEmployeeForm').addEventListener('submit', handleAddEmployee);
       document.getElementById('addPolicyForm').addEventListener('submit', handleAddPolicy);
       document.getElementById('settingsForm').addEventListener('submit', handleSaveSettings);
+      document.getElementById('editEmployeeForm').addEventListener('submit', handleEditEmployee);
+      document.getElementById('editPolicyForm').addEventListener('submit', handleEditPolicy);
+      document.getElementById('editTimeEntryForm').addEventListener('submit', handleEditTimeEntry);
 
       // Set default date filter to today
       document.getElementById('filterDate').valueAsDate = new Date();
@@ -1387,10 +1530,13 @@
                   ${entry.clockOut ? 'Complete' : 'Active'}
                 </span>
               </td>
+              <td>
+                <button class="action-btn edit" onclick="editTimeEntry('${entry._id}', '${entry.employeeName || 'Unknown'}')">✏️</button>
+              </td>
             </tr>
           `).join('');
         } else {
-          tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No time entries found</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No time entries found</td></tr>';
         }
       } catch (err) {
         console.error('Failed to load time entries:', err);
@@ -1670,17 +1816,208 @@
       return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
     }
 
-    // Placeholder functions for edit/delete
-    function editEmployee(id) { alert('Edit employee: ' + id); }
-    function deactivateEmployee(id) { 
-      if (confirm('Deactivate this employee?')) {
-        alert('Deactivate: ' + id);
+    // Edit Employee
+    let currentEditEmployee = null;
+    async function editEmployee(id) {
+      try {
+        const data = await apiCall('/admin-employees');
+        if (data.success) {
+          const emp = data.employees.find(e => e._id === id);
+          if (emp) {
+            currentEditEmployee = emp;
+            document.getElementById('editEmployeeId').value = emp._id;
+            document.getElementById('editFirstName').value = emp.firstName || '';
+            document.getElementById('editLastName').value = emp.lastName || '';
+            document.getElementById('editEmail').value = emp.email || '';
+            document.getElementById('editPhone').value = emp.phone || '';
+            document.getElementById('editDepartment').value = emp.department || 'Field';
+            document.getElementById('editPin').value = '';
+            document.getElementById('editActive').checked = emp.active !== false;
+            openModal('editEmployee');
+          }
+        }
+      } catch (err) {
+        alert('Error loading employee');
       }
     }
-    function editPolicy(id) { alert('Edit policy: ' + id); }
-    function deletePolicy(id) {
-      if (confirm('Delete this policy?')) {
-        alert('Delete: ' + id);
+
+    async function handleEditEmployee(e) {
+      e.preventDefault();
+      const id = document.getElementById('editEmployeeId').value;
+      const data = {
+        firstName: document.getElementById('editFirstName').value,
+        lastName: document.getElementById('editLastName').value,
+        email: document.getElementById('editEmail').value,
+        phone: document.getElementById('editPhone').value,
+        department: document.getElementById('editDepartment').value,
+        active: document.getElementById('editActive').checked
+      };
+      
+      const newPin = document.getElementById('editPin').value;
+      if (newPin && newPin.length === 4) {
+        data.pin = newPin;
+      }
+
+      try {
+        const res = await apiCall(`/admin-employees?id=${id}`, {
+          method: 'PUT',
+          body: JSON.stringify(data)
+        });
+
+        if (res.success) {
+          closeModal('editEmployee');
+          loadEmployees();
+          alert('Employee updated!');
+        } else {
+          alert(res.error || 'Failed to update employee');
+        }
+      } catch (err) {
+        alert('Error updating employee');
+      }
+    }
+
+    async function deactivateEmployee(id) { 
+      if (confirm('Are you sure you want to deactivate this employee? They will no longer be able to clock in.')) {
+        try {
+          const res = await apiCall(`/admin-employees?id=${id}`, { method: 'DELETE' });
+          if (res.success) {
+            loadEmployees();
+            alert('Employee deactivated');
+          } else {
+            alert(res.error || 'Failed to deactivate employee');
+          }
+        } catch (err) {
+          alert('Error deactivating employee');
+        }
+      }
+    }
+
+    // Edit Policy
+    let currentEditPolicy = null;
+    async function editPolicy(id) {
+      try {
+        const data = await apiCall('/admin-policies');
+        if (data.success) {
+          const policy = data.policies.find(p => p._id === id);
+          if (policy) {
+            currentEditPolicy = policy;
+            document.getElementById('editPolicyId').value = policy._id;
+            document.getElementById('editPolicyTitle').value = policy.title || '';
+            document.getElementById('editPolicyDescription').value = policy.description || '';
+            document.getElementById('editPolicyContent').value = policy.content || '';
+            document.getElementById('editPolicyRequired').checked = policy.required !== false;
+            document.getElementById('editPolicyActive').checked = policy.active !== false;
+            openModal('editPolicy');
+          }
+        }
+      } catch (err) {
+        alert('Error loading policy');
+      }
+    }
+
+    async function handleEditPolicy(e) {
+      e.preventDefault();
+      const id = document.getElementById('editPolicyId').value;
+      const data = {
+        title: document.getElementById('editPolicyTitle').value,
+        description: document.getElementById('editPolicyDescription').value,
+        content: document.getElementById('editPolicyContent').value,
+        required: document.getElementById('editPolicyRequired').checked,
+        active: document.getElementById('editPolicyActive').checked
+      };
+
+      try {
+        const res = await apiCall(`/admin-policies?id=${id}`, {
+          method: 'PUT',
+          body: JSON.stringify(data)
+        });
+
+        if (res.success) {
+          closeModal('editPolicy');
+          loadPolicies();
+          alert('Policy updated!');
+        } else {
+          alert(res.error || 'Failed to update policy');
+        }
+      } catch (err) {
+        alert('Error updating policy');
+      }
+    }
+
+    async function deletePolicy(id) {
+      if (confirm('Are you sure you want to delete this policy? This cannot be undone.')) {
+        try {
+          const res = await apiCall(`/admin-policies?id=${id}`, { method: 'DELETE' });
+          if (res.success) {
+            loadPolicies();
+            alert('Policy deleted');
+          } else {
+            alert(res.error || 'Failed to delete policy');
+          }
+        } catch (err) {
+          alert('Error deleting policy');
+        }
+      }
+    }
+
+    // Edit Time Entry
+    let currentEditTimeEntry = null;
+    async function editTimeEntry(id, employeeName) {
+      try {
+        const data = await apiCall(`/admin-time-entries?entryId=${id}`);
+        if (data.success && data.entry) {
+          const entry = data.entry;
+          currentEditTimeEntry = entry;
+          document.getElementById('editTimeEntryId').value = entry._id;
+          document.getElementById('editTimeEntryEmployee').value = employeeName || 'Unknown';
+          
+          // Format dates for datetime-local input
+          if (entry.clockIn) {
+            const clockIn = new Date(entry.clockIn);
+            document.getElementById('editClockIn').value = clockIn.toISOString().slice(0, 16);
+          }
+          if (entry.clockOut) {
+            const clockOut = new Date(entry.clockOut);
+            document.getElementById('editClockOut').value = clockOut.toISOString().slice(0, 16);
+          } else {
+            document.getElementById('editClockOut').value = '';
+          }
+          document.getElementById('editTimeEntryNotes').value = entry.adminNotes || '';
+          openModal('editTimeEntry');
+        }
+      } catch (err) {
+        alert('Error loading time entry');
+      }
+    }
+
+    async function handleEditTimeEntry(e) {
+      e.preventDefault();
+      const id = document.getElementById('editTimeEntryId').value;
+      const clockIn = document.getElementById('editClockIn').value;
+      const clockOut = document.getElementById('editClockOut').value;
+      const notes = document.getElementById('editTimeEntryNotes').value;
+
+      const data = {
+        clockIn: clockIn ? new Date(clockIn).toISOString() : null,
+        clockOut: clockOut ? new Date(clockOut).toISOString() : null,
+        adminNotes: notes
+      };
+
+      try {
+        const res = await apiCall(`/admin-time-entries?id=${id}`, {
+          method: 'PUT',
+          body: JSON.stringify(data)
+        });
+
+        if (res.success) {
+          closeModal('editTimeEntry');
+          loadTimeEntries();
+          alert('Time entry updated!');
+        } else {
+          alert(res.error || 'Failed to update time entry');
+        }
+      } catch (err) {
+        alert('Error updating time entry');
       }
     }
   </script>
